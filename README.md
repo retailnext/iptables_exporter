@@ -53,16 +53,16 @@ Using this exporter, you can then collect packet and byte counts for each of tho
     iptables_default_bytes_total{chain="OUTPUT",policy="ACCEPT",table="mangle"} 2.1481729166e+10
     iptables_default_bytes_total{chain="POSTROUTING",policy="ACCEPT",table="mangle"} 2.1481729166e+10
     iptables_default_bytes_total{chain="PREROUTING",policy="ACCEPT",table="mangle"} 3.0249135756e+10
-    # HELP iptables_default_packets_toal iptables_exporter: Total packets matching a chain's default policy.
-    # TYPE iptables_default_packets_toal counter
-    iptables_default_packets_toal{chain="FORWARD",policy="ACCEPT",table="filter"} 0
-    iptables_default_packets_toal{chain="FORWARD",policy="ACCEPT",table="mangle"} 0
-    iptables_default_packets_toal{chain="INPUT",policy="ACCEPT",table="filter"} 5.5426298e+07
-    iptables_default_packets_toal{chain="INPUT",policy="ACCEPT",table="mangle"} 1.48795042e+08
-    iptables_default_packets_toal{chain="OUTPUT",policy="ACCEPT",table="filter"} 5.6437034e+07
-    iptables_default_packets_toal{chain="OUTPUT",policy="ACCEPT",table="mangle"} 1.46199076e+08
-    iptables_default_packets_toal{chain="POSTROUTING",policy="ACCEPT",table="mangle"} 1.46199076e+08
-    iptables_default_packets_toal{chain="PREROUTING",policy="ACCEPT",table="mangle"} 1.48795045e+08
+    # HELP iptables_default_packets_total iptables_exporter: Total packets matching a chain's default policy.
+    # TYPE iptables_default_packets_total counter
+    iptables_default_packets_total{chain="FORWARD",policy="ACCEPT",table="filter"} 0
+    iptables_default_packets_total{chain="FORWARD",policy="ACCEPT",table="mangle"} 0
+    iptables_default_packets_total{chain="INPUT",policy="ACCEPT",table="filter"} 5.5426298e+07
+    iptables_default_packets_total{chain="INPUT",policy="ACCEPT",table="mangle"} 1.48795042e+08
+    iptables_default_packets_total{chain="OUTPUT",policy="ACCEPT",table="filter"} 5.6437034e+07
+    iptables_default_packets_total{chain="OUTPUT",policy="ACCEPT",table="mangle"} 1.46199076e+08
+    iptables_default_packets_total{chain="POSTROUTING",policy="ACCEPT",table="mangle"} 1.46199076e+08
+    iptables_default_packets_total{chain="PREROUTING",policy="ACCEPT",table="mangle"} 1.48795045e+08
     # HELP iptables_rule_bytes_total iptables_exporter: Total bytes matching a rule.
     # TYPE iptables_rule_bytes_total counter
     iptables_rule_bytes_total{chain="INPUT",rule="-p tcp -m tcp --dport 7000 -j ACCEPT",table="filter"} 1.5726563828e+10
