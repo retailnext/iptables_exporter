@@ -16,8 +16,8 @@ package iptables
 
 import "os/exec"
 
-func GetTables() (Tables, error) {
-	cmd := exec.Command("iptables-save", "-c")
+func GetTables(command string) (Tables, error) {
+	cmd := exec.Command(command, "-c")
 	pipe, err := cmd.StdoutPipe()
 	if err != nil {
 		return nil, err

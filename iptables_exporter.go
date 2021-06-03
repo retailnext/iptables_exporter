@@ -15,7 +15,6 @@
 package main
 
 import (
-	"errors"
 	"net/http"
 	"time"
 
@@ -47,28 +46,28 @@ var (
 	defaultBytesDesc = prometheus.NewDesc(
 		"iptables_default_bytes_total",
 		"iptables_exporter: Total bytes matching a chain's default policy.",
-		[]string{"table", "chain", "policy"},
+		[]string{"command", "table", "chain", "policy"},
 		nil,
 	)
 
 	defaultPacketsDesc = prometheus.NewDesc(
 		"iptables_default_packets_total",
 		"iptables_exporter: Total packets matching a chain's default policy.",
-		[]string{"table", "chain", "policy"},
+		[]string{"command", "table", "chain", "policy"},
 		nil,
 	)
 
 	ruleBytesDesc = prometheus.NewDesc(
 		"iptables_rule_bytes_total",
 		"iptables_exporter: Total bytes matching a rule.",
-		[]string{"table", "chain", "rule"},
+		[]string{"command", "table", "chain", "rule"},
 		nil,
 	)
 
 	rulePacketsDesc = prometheus.NewDesc(
 		"iptables_rule_packets_total",
 		"iptables_exporter: Total packets matching a rule.",
-		[]string{"table", "chain", "rule"},
+		[]string{"command", "table", "chain", "rule"},
 		nil,
 	)
 )
@@ -83,55 +82,61 @@ func (c *collector) Describe(descChan chan<- *prometheus.Desc) {
 }
 
 func (c *collector) Collect(metricChan chan<- prometheus.Metric) {
+	commands := []string{"iptables-save", "ip6tables-save"}
 	start := time.Now()
-	tables, err := iptables.GetTables()
+
 	duration := time.Since(start)
-	if err == nil && len(tables) == 0 {
-		err = errors.New("no output from iptables-save; this is probably due to insufficient permissions")
-	}
 	metricChan <- prometheus.MustNewConstMetric(scrapeDurationDesc, prometheus.GaugeValue, duration.Seconds())
-	if err != nil {
-		metricChan <- prometheus.MustNewConstMetric(scrapeSuccessDesc, prometheus.GaugeValue, 0)
-		log.Error(err)
-		return
-	}
 	metricChan <- prometheus.MustNewConstMetric(scrapeSuccessDesc, prometheus.GaugeValue, 1)
 
-	for tableName, table := range tables {
-		for chainName, chain := range table {
-			metricChan <- prometheus.MustNewConstMetric(
-				defaultPacketsDesc,
-				prometheus.CounterValue,
-				float64(chain.Packets),
-				tableName,
-				chainName,
-				chain.Policy,
-			)
-			metricChan <- prometheus.MustNewConstMetric(
-				defaultBytesDesc,
-				prometheus.CounterValue,
-				float64(chain.Bytes),
-				tableName,
-				chainName,
-				chain.Policy,
-			)
-			for _, rule := range chain.Rules {
+	for _, command := range commands {
+		tables, err := iptables.GetTables(command)
+		if err != nil {
+			metricChan <- prometheus.MustNewConstMetric(scrapeSuccessDesc, prometheus.GaugeValue, 0)
+			log.Error(err)
+			return
+		}
+
+		for tableName, table := range tables {
+			for chainName, chain := range table {
 				metricChan <- prometheus.MustNewConstMetric(
-					rulePacketsDesc,
+					defaultPacketsDesc,
 					prometheus.CounterValue,
-					float64(rule.Packets),
+					float64(chain.Packets),
+					command,
 					tableName,
 					chainName,
-					rule.Rule,
+					chain.Policy,
 				)
 				metricChan <- prometheus.MustNewConstMetric(
-					ruleBytesDesc,
+					defaultBytesDesc,
 					prometheus.CounterValue,
-					float64(rule.Bytes),
+					float64(chain.Bytes),
+					command,
 					tableName,
 					chainName,
-					rule.Rule,
+					chain.Policy,
 				)
+				for _, rule := range chain.Rules {
+					metricChan <- prometheus.MustNewConstMetric(
+						rulePacketsDesc,
+						prometheus.CounterValue,
+						float64(rule.Packets),
+						command,
+						tableName,
+						chainName,
+						rule.Rule,
+					)
+					metricChan <- prometheus.MustNewConstMetric(
+						ruleBytesDesc,
+						prometheus.CounterValue,
+						float64(rule.Bytes),
+						command,
+						tableName,
+						chainName,
+						rule.Rule,
+					)
+				}
 			}
 		}
 	}
