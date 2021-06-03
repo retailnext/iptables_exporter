@@ -146,8 +146,18 @@ func main() {
 	// Adapted from github.com/prometheus/node_exporter
 
 	var (
-		listenAddress = kingpin.Flag("web.listen-address", "Address on which to expose metrics and web interface.").Default(":9455").String()
-		metricsPath   = kingpin.Flag("web.telemetry-path", "Path under which to expose metrics.").Default("/metrics").String()
+		listenAddress = kingpin.Flag(
+			"web.listen-address",
+			"Address on which to expose metrics and web interface.",
+		).Default(
+			":9455",
+		).String()
+		metricsPath = kingpin.Flag(
+			"web.telemetry-path",
+			"Path under which to expose metrics.",
+		).Default(
+			"/metrics",
+		).String()
 	)
 
 	log.AddFlags(kingpin.CommandLine)
